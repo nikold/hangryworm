@@ -8,7 +8,7 @@ import com.dubraver.game.screens.MenuScreen;
 public class HungryWorm extends Game {
 	public SpriteBatch batch;
 	public BitmapFont font;
-    //тест
+    //test 
 	@Override
 	public void create() {
 		
