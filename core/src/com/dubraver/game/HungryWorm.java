@@ -14,7 +14,7 @@ public class HungryWorm extends Game {
 		
 		batch = new SpriteBatch();
         font = new BitmapFont();
-		//567576
+		//09032016 blya blya 
 		setScreen(new MenuScreen(this));
 	}
 }
