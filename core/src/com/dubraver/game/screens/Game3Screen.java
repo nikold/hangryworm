@@ -1,6 +1,7 @@
 package com.dubraver.game.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -25,8 +26,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
+import com.badlogic.gdx.utils.Array;
 import com.dubraver.game.HungryWorm;
 import com.dubraver.game.utils.Constants;
+
+import javafx.scene.input.KeyCode;
 
 public class Game3Screen implements Screen{
 	
@@ -37,8 +41,10 @@ public class Game3Screen implements Screen{
 	private String text = "Return";
 	private TextButton newGameButton;
 
-	private float speed = 2;
+	private float speed = 0.5f;
 	private float multiplier = 1f;
+	public float prevX;
+	public float prevY;
 	private ShapeRenderer shape = new ShapeRenderer();
 	
 	private Skin skinUIButtons;
@@ -54,7 +60,7 @@ public class Game3Screen implements Screen{
 	private Button btnRight;
 	private Button btnUp;
 	private Button btnDown;
-	private Rectangle wormRectangle;
+	private NewWormRectangle wormRectangle;
 	private Texture wormTexture;
 	
 	private enum ButtonStates {
@@ -72,7 +78,7 @@ public class Game3Screen implements Screen{
 	private Texture foodTexture;
 	private Rectangle foodRectangle;
 	private boolean foodEated;
-	
+	private Array<NewWormRectangle> wormRectangles = new Array<NewWormRectangle>();
 	public Game3Screen(HungryWorm game) {
 		
 		this.game = game;
@@ -105,11 +111,11 @@ public class Game3Screen implements Screen{
 		pixmap.fill();
 
 		wormTexture = new Texture(pixmap);
-		wormRectangle = new WormRectangle(null,Constants.APP_WIDTH / 2,
+		wormRectangle = new NewWormRectangle(null,Constants.APP_WIDTH / 2,
 				Constants.APP_HEIGHT / 2, 40, 40);
+		wormRectangles.add(wormRectangle);
 	}
-	
-	//функция создающая в случайном месте квадрат еды
+
 	private void createFood() {
 		Pixmap pixmap = new Pixmap(50, 50, Format.RGBA8888);
 		pixmap.setColor(1, 0, 0, .6f);
@@ -120,6 +126,15 @@ public class Game3Screen implements Screen{
 		int y = (int) MathUtils.random(2, (Constants.APP_HEIGHT - wormRectangle.height)/ wormRectangle.height);
 		foodRectangle = new Rectangle(x * wormRectangle.width,y * wormRectangle.height,
 				40, 40);
+	}
+
+	private void DrawElements() {
+		// TODO Auto-generated method stub
+		for (int i = 1; i < wormRectangles.size; i++) {
+			NewWormRectangle currentElement = wormRectangles.get(i);
+			game.batch.draw(currentElement.textureBody, currentElement.x, currentElement.y,
+					currentElement.width, currentElement.height);
+		}
 	}
 	
 	private void createReturnButton(Stage gameStage) {
@@ -307,13 +322,39 @@ public class Game3Screen implements Screen{
 		game.batch.setProjectionMatrix(camera.combined);
 		
 		ProcessKeyInput(delta);
+
+		if (currentDirectState == DirectStates.EMPTY){
+			prevX = wormRectangle.x;
+			prevY = wormRectangle.y;
+		}
+		if (Math.abs(wormRectangle.x - prevX) > wormRectangle.width){
+			prevDirectState = currentDirectState;
+			prevX = wormRectangle.x;
+			prevY = wormRectangle.y;
+		}
+		if (Math.abs(wormRectangle.y - prevY) > wormRectangle.width){
+			prevDirectState = currentDirectState;
+			prevX = wormRectangle.x;
+			prevY = wormRectangle.y;
+		}
+
 		MoveWormRectangle(currentDirectState, delta);
-		
+
+		for (int i = 0; i < wormRectangles.size; i++) {
+			if (wormRectangles.get(i).next != null) {
+				wormRectangles.get(i).ChangeCurrentCoordinates();
+			}else
+			{
+				wormRectangles.get(i).currentDirectState = prevDirectState;
+			}
+		}
+
+
 		game.batch.begin();
 		
 		game.batch.draw(textureRegion, textureRegionBounds1.x, textureRegionBounds1.y, Constants.APP_WIDTH, Constants.APP_HEIGHT);
 		DrawHead();
-		
+		DrawElements();
 		if (foodRectangle != null){
 
 			game.batch.draw(foodTexture, foodRectangle.x,
@@ -340,15 +381,38 @@ public class Game3Screen implements Screen{
 		
 		if (wormRectangle.overlaps(foodRectangle) && !foodEated) {
 
+			createWormElement(wormRectangles.peek(), foodRectangle.x, foodRectangle.y);
+
 			foodEated = true;
 			foodRectangle = null;
 		}
 	}
-	
+
+	private void createWormElement(NewWormRectangle next, float x, float y) {
+
+		NewWormRectangle wormElementRectangle = new NewWormRectangle(next, x,
+				y, wormRectangle.width, wormRectangle.height);
+
+		wormRectangles.add(wormElementRectangle);
+
+	}
+
 	private void ProcessKeyInput(float delta) {
-		if (!Gdx.input.justTouched())
-			return;
-		
+		//if (!Gdx.input.justTouched())
+		//	return;
+
+		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+			currentButtonState = ButtonStates.LEFT_BUTTON_TOUCH_DOWN;
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+			currentButtonState = ButtonStates.RIGHT_BUTTON_TOUCH_DOWN;
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+			currentButtonState = ButtonStates.UP_BUTTON_TOUCH_DOWN;
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+			currentButtonState = ButtonStates.DOWN_BUTTON_TOUCH_DOWN;
+		}
 		
 		if (currentButtonState == ButtonStates.LEFT_BUTTON_TOUCH_DOWN) {
 			currentDirectState = DirectStates.LEFT;
