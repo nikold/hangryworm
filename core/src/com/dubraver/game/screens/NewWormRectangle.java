@@ -21,7 +21,7 @@ public class NewWormRectangle extends Rectangle {
 		
 		Pixmap pixmap = new Pixmap(50, 50, Format.RGBA8888);
 		pixmap.setColor(1, 0, 1, .6f);
-		pixmap.fill();
+		pixmap.fill() ;
 
 		textureBody = new Texture(pixmap);
 	}
