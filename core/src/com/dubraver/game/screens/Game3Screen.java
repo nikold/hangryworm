@@ -41,7 +41,7 @@ public class Game3Screen implements Screen{
 	private String text = "Return";
 	private TextButton newGameButton;
 
-	private float speed = 0.5f;
+	private float speed = 1f;
 	private float multiplier = 1f;
 	public float prevX;
 	public float prevY;
@@ -327,22 +327,38 @@ public class Game3Screen implements Screen{
 			prevX = wormRectangle.x;
 			prevY = wormRectangle.y;
 		}
-		if (Math.abs(wormRectangle.x - prevX) > wormRectangle.width){
+		if (Math.abs(wormRectangle.x - prevX) >= wormRectangle.width){
 			prevDirectState = currentDirectState;
 			prevX = wormRectangle.x;
 			prevY = wormRectangle.y;
 		}
-		if (Math.abs(wormRectangle.y - prevY) > wormRectangle.width){
+		if (Math.abs(wormRectangle.y - prevY) >= wormRectangle.width){
 			prevDirectState = currentDirectState;
 			prevX = wormRectangle.x;
 			prevY = wormRectangle.y;
 		}
 
 		MoveWormRectangle(currentDirectState, delta);
-
+		float width = wormRectangle.width;
 		for (int i = 0; i < wormRectangles.size; i++) {
 			if (wormRectangles.get(i).next != null) {
-				wormRectangles.get(i).ChangeCurrentCoordinates();
+				if(prevDirectState == Game3Screen.DirectStates.RIGHT){
+					wormRectangles.get(i).x = prevX - width;
+					wormRectangles.get(i).y = prevY;
+				}
+				if(prevDirectState == Game3Screen.DirectStates.LEFT){
+					wormRectangles.get(i).x = prevX + width;
+					wormRectangles.get(i).y = prevY;
+				}
+				if(prevDirectState == Game3Screen.DirectStates.UP){
+					wormRectangles.get(i).x = prevX;
+					wormRectangles.get(i).y = prevY - width;
+				}
+				if(prevDirectState == Game3Screen.DirectStates.DOWN){
+					wormRectangles.get(i).x = prevX;
+					wormRectangles.get(i).y = prevY + width;
+				}
+				//wormRectangles.get(i).
 			}else
 			{
 				wormRectangles.get(i).currentDirectState = prevDirectState;
