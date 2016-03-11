@@ -62,6 +62,8 @@ public class Game3Screen implements Screen{
 	private Button btnDown;
 	private NewWormRectangle wormRectangle;
 	private Texture wormTexture;
+	private float wormHeight = 20f;
+	private float wormWidth = 20f;
 	
 	private enum ButtonStates {
 		LEFT_BUTTON_TOUCH_DOWN, LEFT_BUTTON_TOUCH_UP, RIGHT_BUTTON_TOUCH_DOWN, RIGHT_BUTTON_TOUCH_UP, EMPTY, DOWN_BUTTON_TOUCH_DOWN, UP_BUTTON_TOUCH_DOWN, UP_BUTTON_TOUCH_UP, DOWN_BUTTON_TOUCH_UP
@@ -112,7 +114,7 @@ public class Game3Screen implements Screen{
 
 		wormTexture = new Texture(pixmap);
 		wormRectangle = new NewWormRectangle(null,Constants.APP_WIDTH / 2,
-				Constants.APP_HEIGHT / 2, 40, 40);
+				Constants.APP_HEIGHT / 2, wormHeight, wormWidth);
 		wormRectangles.add(wormRectangle);
 	}
 
@@ -125,7 +127,7 @@ public class Game3Screen implements Screen{
 		int x = (int) MathUtils.random(2, (Constants.APP_WIDTH - wormRectangle.width)/ wormRectangle.width);
 		int y = (int) MathUtils.random(2, (Constants.APP_HEIGHT - wormRectangle.height)/ wormRectangle.height);
 		foodRectangle = new Rectangle(x * wormRectangle.width,y * wormRectangle.height,
-				40, 40);
+				wormHeight, wormWidth);
 	}
 
 	private void DrawElements() {
@@ -337,9 +339,15 @@ public class Game3Screen implements Screen{
 			prevX = wormRectangle.x;
 			prevY = wormRectangle.y;
 		}
-
+		
+		float width = 0;
 		MoveWormRectangle(currentDirectState, delta);
-		float width = wormRectangle.width;
+		if (prevDirectState == currentDirectState) {
+			width = wormRectangle.width;
+		}
+		else{
+			width = 0f;
+		}
 		for (int i = 0; i < wormRectangles.size; i++) {
 			if (wormRectangles.get(i).next != null) {
 				if(prevDirectState == Game3Screen.DirectStates.RIGHT){
@@ -371,6 +379,7 @@ public class Game3Screen implements Screen{
 		game.batch.draw(textureRegion, textureRegionBounds1.x, textureRegionBounds1.y, Constants.APP_WIDTH, Constants.APP_HEIGHT);
 		DrawHead();
 		DrawElements();
+		//Create Food
 		if (foodRectangle != null){
 
 			game.batch.draw(foodTexture, foodRectangle.x,
@@ -382,8 +391,6 @@ public class Game3Screen implements Screen{
 				createFood();
 				foodEated = false;
 			}
-			//System.out.println("new food X " + lastXWormCoordinate);
-			//System.out.println("new food Y " + lastYWormCoordinate);
 			game.batch.draw(foodTexture, foodRectangle.x,
 						foodRectangle.y, wormRectangle.width,
 						wormRectangle.height);
