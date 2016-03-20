@@ -12,5 +12,10 @@ public class Constants {
 	public static final String HEAD_DOWN_IMAGE_PATH = "headDown.png";
 	public static final String BODY_IMAGE_PATH = "body.png";
 
+	//World
+	public static final int WORLD_HEIGHT = 12;
+	public static final int WORLD_WIDTH = 20;
+
+	public static final float WORLD_SPEED = 0.3f;
 
 }

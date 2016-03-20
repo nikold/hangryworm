@@ -116,7 +116,7 @@ public class MenuScreen implements Screen {
 		
 		newGameButton1.addListener(new InputListener() {
 	        public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-	        	game.setScreen(new Game3Screen(game));
+	        	game.setScreen(new GameScreen(game));
 		        dispose();
 	            return true;  // must return true for touchUp event to occur
 	        }

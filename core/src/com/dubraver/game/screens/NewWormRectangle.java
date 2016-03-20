@@ -26,33 +26,43 @@ public class NewWormRectangle extends Rectangle {
 		textureBody = new Texture(pixmap);
 	}
 
+	public void SaveDirectState(){
+
+		if (next.currentDirectState == DirectStates.EMPTY){
+			prevX = x;
+			prevY = y;
+		}
+		if (Math.abs(x - prevX) >= width){
+			prevDirectState = next.currentDirectState;
+			prevX = next.x;
+			prevY = next.y;
+		}
+		if (Math.abs(y - prevY) >= width){
+			prevDirectState = next.currentDirectState;
+			prevX = next.x;
+			prevY = next.y;
+		}
+	}
+
 	public void ChangeCurrentCoordinates(){
 		if(next != null){
-			float lastXWormCoordinate = next.x;
-			float lastYWormCoordinate = next.y;
-
-			currentDirectState = next.currentDirectState;
-			if(currentDirectState == Game3Screen.DirectStates.RIGHT){
-				lastXWormCoordinate = next.x - width;
-				lastYWormCoordinate = y;
+			if(prevDirectState == Game3Screen.DirectStates.RIGHT){
+				x = prevX - width;
+				y = prevY;
 			}
-			if(currentDirectState == Game3Screen.DirectStates.LEFT){
-				lastXWormCoordinate = next.x + width;
-				lastYWormCoordinate = y;
+			if(prevDirectState == Game3Screen.DirectStates.LEFT){
+				x = prevX + width;
+				y = prevY;
 			}
-			if(currentDirectState == Game3Screen.DirectStates.UP){
-				lastXWormCoordinate = x;
-				lastYWormCoordinate = next.y - width;
+			if(prevDirectState == Game3Screen.DirectStates.UP){
+				x = prevX;
+				y = prevY - width;
 			}
-			if(currentDirectState == Game3Screen.DirectStates.DOWN){
-				lastXWormCoordinate = x;
-				lastYWormCoordinate = next.y + width;
+			if(prevDirectState == Game3Screen.DirectStates.DOWN){
+				x = prevX;
+				y = prevY + width;
 			}
-			System.out.println("n x " + next.x + ". n y " + next.y);
-			System.out.println("x " + lastXWormCoordinate + ". y " + lastYWormCoordinate);
-			this.x = lastXWormCoordinate;
-			this.y = lastYWormCoordinate;
-			prevDirectState = currentDirectState;
+			currentDirectState = prevDirectState;
 		}
 	}
 }
